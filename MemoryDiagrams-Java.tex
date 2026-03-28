@@ -1,16 +1,23 @@
+\DocumentMetadata{
+  lang=en,
+  pdfversion=2.0,
+  testphase={phase-III}
+}
 \documentclass{article}
 \usepackage{fullpage}
 \usepackage{float}
 \usepackage{graphicx}
 \setkeys{Gin}{width=\textwidth,keepaspectratio}%,draft}
 
-\usepackage{listings}
-\lstset{
-  basicstyle=\ttfamily\small,
-  columns=fullflexible,
-  keepspaces=true,
-  showstringspaces=false,
-  breaklines=true
+\usepackage[hidelinks]{hyperref}
+\usepackage{bookmark}
+\hypersetup{
+  pdftitle={Reference Guide for Stack Tracing in Java},
+  pdfauthor={},
+  pdflang={en},
+  pdfdisplaydoctitle=true,
+  bookmarksopen=true,
+  bookmarksnumbered=true,
 }
 
 \begin{document}
@@ -23,7 +30,7 @@
 
 \section{Basic Java}
 
-\begin{lstlisting}
+\begin{verbatim}
     public static void main(String[] args) {
         int anInt = 10;
         double aDouble = 5.8;
@@ -31,7 +38,7 @@
         String aString = "6.3";
         anInt = 20;
     }
-\end{lstlisting}
+\end{verbatim}
 
 \begin{itemize}
 	\item variable changes result in previous values being crossed out and
@@ -40,7 +47,9 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{1-variables.png}
+	\includegraphics[alt={Memory diagram for main: stack frame with local variables anInt, aDouble, aBoolean, 
+	and aString. anInt shows reassignment from 10 to 
+	20 with the previous value crossed out.}]{1-variables.png}
 \end{figure}
 
 \pagebreak
@@ -74,7 +83,10 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{functionReturn.png}
+	\includegraphics[alt={Memory diagram for multiplyByTwo and main: separate stack frames for 
+	each call. parameters and local variables including x and result. return values flowing back to 
+	the caller. references from stack variables to heap as needed. IO area showing println 
+	output.}]{functionReturn.png}
 \end{figure}
 
 \pagebreak
@@ -94,7 +106,9 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{2_2-functionNoReturn.png}
+	\includegraphics[alt={Memory diagram for printValue and main. separate stack frames for each call. 
+	local temp computed from the argument. println output in the IO area. no 
+	return value passed back to main.}]{2_2-functionNoReturn.png}
 \end{figure}
 
 \pagebreak
@@ -114,7 +128,8 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{forBasic.png}
+	\includegraphics[alt={Memory diagram for a basic for loop. main frame with x and loop index i. progression 
+	of i across iterations. println output for each i in the IO area.}]{forBasic.png}
 \end{figure}
 
 \subsection{Scoped Variable}
@@ -134,7 +149,8 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{forScoped.png}
+	\includegraphics[alt={Memory diagram for a for loop with scoped variable temp: temp exists only 
+	inside the loop body. dashed or crossed-out notation after the loop ends to show temp is out of scope.}]{forScoped.png}
 \end{figure}
 
 \pagebreak
@@ -167,7 +183,9 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{arrayLists.png}
+	\includegraphics[alt={Memory diagram for two ArrayList variables: arr1 on the stack pointing to 
+	an ArrayList object on the heap with elements added in the loop, and arr2 assigned from arr1 so 
+	both references share the same heap object. addresses labeled consistently on stack and heap.}]{arrayLists.png}
 \end{figure}
 
 \pagebreak
@@ -205,7 +223,10 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{arrayListsFunc.png}
+	\includegraphics[alt={Memory diagram for sum and main: main holds arr1 and arr2 
+	referencing the same heap ArrayList. sum frame with parameter arrIn referencing that 
+	same ArrayList. loop index and accumulator out while summing via get. return value 
+	total on the stack.}]{arrayListsFunc.png}
 \end{figure}
 
 \pagebreak
@@ -232,7 +253,9 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{5-hashMaps.png}
+	\includegraphics[alt={Memory diagram for a HashMap bills: map object on the heap with 
+	string keys and integer values. main frame. for-each over keySet with a scoped loop variable. 
+	println keys in the IO area.}]{5-hashMaps.png}
 \end{figure}
 
 \pagebreak
@@ -267,7 +290,9 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{recursionStandard.png}
+	\includegraphics[alt={Memory diagram for standard recursion computeGeometricSum: 
+	stack frames for each recursive call. local result 
+	and return arrows showing values passed back. base case at n equals 0.}]{recursionStandard.png}
 \end{figure}
 
 \pagebreak
@@ -301,7 +326,9 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{recursionTail.png}
+	\includegraphics[alt={Memory diagram for tail recursion computeGeometricSumTail and helper: 
+	 frames with n and total. return arrows pointing through the chain to the original 
+	caller result variable rather than to intermediate locals.}]{recursionTail.png}
 \end{figure}
 
 \pagebreak
@@ -349,7 +376,9 @@ public class Player {
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{7-classes.png}
+	\includegraphics[alt={Memory diagram for Player objects: two Player instances on the heap with 
+	fields xLoc, yLoc, maxHP, HP, and damageDealt. main with player1 and player2 references. effects 
+	of move and attack on instance variables.}]{7-classes.png}
 \end{figure}
 
 \pagebreak
@@ -391,7 +420,9 @@ public class Teleporter extends GameItem {
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{8-inheritance.png}
+	\includegraphics[alt={Memory diagram for GameItem and Teleporter: Teleporter object on the heap 
+	with subclass fields dx and dy plus inherited xLoc and yLoc. constructor calling super constructor. stack 
+	frame for main and reference t. move updating locations.}]{8-inheritance.png}
 \end{figure}
 
 \pagebreak
@@ -437,7 +468,9 @@ public class RunABC {
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{9-polymorphism.png}
+	\includegraphics[alt={Memory diagram for polymorphism with classes A, B, and C: variables 
+	of type A in main holding references to an A instance, a B instance, and a C instance on 
+	the heap. each object shows its actual instance variables including a, b, or c.}]{9-polymorphism.png}
 \end{figure}
 
 \end{document}
