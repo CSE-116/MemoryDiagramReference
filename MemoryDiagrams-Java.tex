@@ -4,31 +4,34 @@
 \usepackage{graphicx}
 \setkeys{Gin}{width=\textwidth,keepaspectratio}%,draft}
 
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  breaklines=true
+}
+
 \begin{document}
 
-\title{Reference Guide for Stack Tracing Java}
+\title{Reference Guide for Stack Tracing in Java}
 \author{}
-\date{2025-05-13}
+\date{2026-03-28}
 
 \maketitle
 
-\section*{FYI}
-\begin{itemize}
-	\item Only a single color is required for memory diagrams, different colors
-	are used (and order written into code) for greater clarity in this document
-\end{itemize}
-
 \section{Basic Java}
 
-\begin{verbatim}
-	public static void main(String[] args) {
-	    int anInt = 10;
-	    double aDouble = 5.8;
-	    boolean Boolean = true;
-	    String aString = "6.3";
-	    anInt = 20;
-	}
-\end{verbatim}
+\begin{lstlisting}
+    public static void main(String[] args) {
+        int anInt = 10;
+        double aDouble = 5.8;
+        boolean aBoolean = true;
+        String aString = "6.3";
+        anInt = 20;
+    }
+\end{lstlisting}
 
 \begin{itemize}
 	\item variable changes result in previous values being crossed out and
@@ -37,13 +40,13 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{basicVariables.png}
+	\includegraphics{1-variables.png}
 \end{figure}
 
 \pagebreak
 
 
-\section{Function calls}
+\section{Method calls}
 
 \subsection{Return value}
 
@@ -79,19 +82,19 @@
 \subsection{No return value}
 
 \begin{verbatim}
-	public static double printValue(int a) {
-	    int temp = n+2;
-	    System.out.println("temp == " + temp);
-	}
+    public static void printValue(int n) {
+        int temp = n+2;
+        System.out.println("temp == " + temp);
+    }
 
-	public static void main (String[] args) {
-	    printValue(4);
-	}
+    public static void main (String[] args) {
+        printValue(4);
+    }
 \end{verbatim}
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{functionNoReturn.png}
+	\includegraphics{2_2-functionNoReturn.png}
 \end{figure}
 
 \pagebreak
@@ -126,7 +129,7 @@
 \end{verbatim}
 
 \begin{itemize}
-	\item scoped variables within the loop are crossed out after the loop completes
+	\item the dashed lines indicates the variables that are scoped within the loop are crossed out after the loop completes
 \end{itemize}
 
 \begin{figure}[H]
@@ -154,17 +157,11 @@
 \begin{itemize}
 	\item note that the assignment statement for arr2 assigns the memory address
 	and does not do a deep copy
-	\begin{itemize}
-		\item this point is emphasized for newer programmers
-	\end{itemize}
 	\item memory addresses all start with 0x to indicate that they are
 	hexadecimal numbers.
 	\begin{itemize}
-		\item heap addresses are typically given 3 digit numbers
-		\item numbers are typically written in decimal as it is easier for
-		students to grasp at first (as they are not familiar with hexadecimal,
-		this detail will be corrected in later courses)
-		\item numbers are randomly generated and just must agree on the stack and heap
+		\item heap addresses are given 3 digit numbers in the tracing tool
+		\item numbers effectively random. The values are not important as long it is consistent across the stack and heap
 	\end{itemize}
 \end{itemize}
 
@@ -202,9 +199,8 @@
 \begin{itemize}
 	\item when passing variables to functions as arguments the value on the
 	stack associated with the variable name is the argument to the function
-	that sets the parameter
-	\item the dashed lines around index indicate that it is a scoped variable
-	that only exists while the loop exists
+	that sets the parameter, even when that value is a reference to an object on the heap
+
 \end{itemize}
 
 \begin{figure}[H]
@@ -218,16 +214,14 @@
 \section{HashMaps}
 
 \begin{verbatim}
-	public static void main (String[] args) {
-	    HashMap<String, Integer> bills = new HashMap<>();
-	    
-	    bills.put("Allen", 17);
-	    bills.put("Diggs", 14);
-	    
-	    for (String keys: bills.keySet()) {
-	      System.out.println(keys);
-	    }
-	}
+    public static void main(String[] args) {
+        HashMap<String, Integer> bills = new HashMap<>();
+        bills.put("Allen", 17);
+        bills.put("Knox", 88);
+        for (String key : bills.keySet()) {
+            System.out.println(key);
+        }
+    }
 \end{verbatim}
 
 \begin{itemize}
@@ -238,7 +232,7 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{hashMaps.png}
+	\includegraphics{5-hashMaps.png}
 \end{figure}
 
 \pagebreak
@@ -265,7 +259,7 @@
 \end{verbatim}
 
 \begin{itemize}
-	\item each new call of cGS is performed in a new color
+	\item each new call of computeGeometricSum is performed in a new color
 	\begin{itemize}
 		\item returned values are kept in the color of the method that returns it
 	\end{itemize}
@@ -283,7 +277,7 @@
 \begin{verbatim}
 	public static int computeGeometricSumTail(int n, int total) {
 	    if (n > 0) {
-	        return computeGeometricSum(n - 1, total + n);
+	        return computeGeometricSumTail(n - 1, total + n);
 	    } else {
 	        return total;
 	    }
@@ -299,15 +293,8 @@
 \end{verbatim}
 
 \begin{itemize}
-	\item each new call of cGST is performed in a new color
-	\begin{itemize}
-		\item returned values are kept in the color of the method that returns it
-	\end{itemize}
-	\item Note that the returns go to the previous function's return and not a variable
-	\begin{itemize}
-		\item this is why the memory of a stack frame can be released before
-		the following recursive function call finishes
-	\end{itemize}
+	\item Note that all the return arrows point to the original return variable when using tail recursion. It is also acceptable to omit 
+	the return arrows entirely since the recursive calls do not return direectly to a variable
 \end{itemize}
 
 \textit{(Solution on next page)}
@@ -362,7 +349,7 @@ public class Player {
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{classes.png}
+	\includegraphics{7-classes.png}
 \end{figure}
 
 \pagebreak
@@ -404,7 +391,7 @@ public class Teleporter extends GameItem {
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{inheritance.png}
+	\includegraphics{8-inheritance.png}
 \end{figure}
 
 \pagebreak
@@ -450,7 +437,7 @@ public class RunABC {
 
 \begin{figure}[H]
 	\centering
-	\includegraphics{polymorphism.png}
+	\includegraphics{9-polymorphism.png}
 \end{figure}
 
 \end{document}
